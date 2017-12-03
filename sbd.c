@@ -133,7 +133,8 @@ static int __init sbd_init(void)
 */
 	Device.size = nsectors * logical_block_size;
 	spin_lock_init(&Device.lock);
-	Device.data = vmalloc(Device.size);
+//	Device.data = vmalloc(Device.size);
+	Device.data = (u8 *)ioremap((phys_addr_t)(0xdeadbeef), Device.size);
 	if (Device.data == NULL)
 		return -ENOMEM;
 /*
