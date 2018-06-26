@@ -1,6 +1,6 @@
 digraph {
 	#	concentrate=true 			# merge A->B, B->A
-	label="Example Graph (Emit return path)" 	# http://www.graphviz.org/doc/info/attrs.html
+	label="Example Graph (Omit return path)" 	# http://www.graphviz.org/doc/info/attrs.html
 
 	subgraph cluster_0 {
 	label="user space"
