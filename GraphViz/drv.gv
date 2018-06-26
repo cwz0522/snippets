@@ -1,0 +1,33 @@
+digraph {
+	#	concentrate=true 			# merge A->B, B->A
+	label="Example Graph (Emit return path)" 	# http://www.graphviz.org/doc/info/attrs.html
+
+	subgraph cluster_0 {
+	label="user space"
+
+	color=blue 					# border color,	https://www.graphviz.org/doc/info/colors.html
+	APP [shape=box, label="APP"];
+	"libtest.so" [shape=box, label="libtest.so"];
+	}
+
+	subgraph cluster_1 {
+	label="kernel space"
+	color=red 					# border color
+	test_drv [shape=box, label="test_drv"];
+		subgraph cluster_2 {
+		color=black 				# revert to original border color
+		label="HW driver"
+		ioctl [shape=box, label="ioctl"];
+		Others [shape=box, label="Others API"];
+		}
+	}
+
+
+	test_drv -> ioctl 		#[dir="both"]
+	APP -> "libtest.so" -> ioctl 	#[dir="both"]
+	test_drv -> Others 		#[dir="both"]
+
+
+#	{ rank=same; APP, test_drv }
+
+}

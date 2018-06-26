@@ -1,0 +1,23 @@
+digraph {
+	start [label="Start"];
+	cond1 [shape=diamond, label="Is Addr valid?"];
+	cond2 [shape=diamond, label="Is mode valid?"];
+	cond3 [shape=diamond, label="Has Data?"];
+	cond4 [shape=diamond, label="Has errors?"];
+	op1 [shape=box, label="op1"];
+	end [label="end"]
+
+	start -> cond1;
+
+	cond1 -> cond2 [label="Yes"];
+	cond2 -> cond3 [label="Yes"]
+	cond3 -> op1 [label="Yes"]
+	op1 -> cond4
+	cond4 -> end [label="Yes"]
+
+	cond1 -> end [label="No"];
+	cond2 -> end [label="No"]
+	cond3 -> end [label="No"]
+	cond4 -> cond3 [label="No"]
+
+}
