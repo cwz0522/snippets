@@ -9,14 +9,16 @@ digraph {
 
 	color=blue 					# border color,	https://www.graphviz.org/doc/info/colors.html
 	APP [label="APP"];
-	"libtest.so" [label="libtest.so"];
+	"libtest.so" [label="libtest.so", style=filled, fillcolor="red:white"];
 	}
 
 	subgraph cluster_1 {
+	graph [style=filled, fillcolor="darkolivegreen1:white"];
 	label="kernel space"
 	color=red 					# border color
-	test_drv [label="test_drv"];
+	test_drv [label="test_drv",style=filled, fillcolor="white"];
 		subgraph cluster_2 {
+		graph [style=filled, fillcolor="white"];
 		color=black 				# revert to original border color
 		label="HW driver"
 		ioctl [label="ioctl"];
