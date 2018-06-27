@@ -1,4 +1,6 @@
 digraph {
+#	graph [dpi=300] #equivalent to -Gdpi=300 in CLI
+	node [shape=box]				# set node's default attrs
 	#	concentrate=true 			# merge A->B, B->A
 	label="Example Graph (Omit return path)" 	# http://www.graphviz.org/doc/info/attrs.html
 
@@ -6,19 +8,19 @@ digraph {
 	label="user space"
 
 	color=blue 					# border color,	https://www.graphviz.org/doc/info/colors.html
-	APP [shape=box, label="APP"];
-	"libtest.so" [shape=box, label="libtest.so"];
+	APP [label="APP"];
+	"libtest.so" [label="libtest.so"];
 	}
 
 	subgraph cluster_1 {
 	label="kernel space"
 	color=red 					# border color
-	test_drv [shape=box, label="test_drv"];
+	test_drv [label="test_drv"];
 		subgraph cluster_2 {
 		color=black 				# revert to original border color
 		label="HW driver"
-		ioctl [shape=box, label="ioctl"];
-		Others [shape=box, label="Others API"];
+		ioctl [label="ioctl"];
+		Others [label="Others API"];
 		}
 	}
 
@@ -26,6 +28,7 @@ digraph {
 	test_drv -> ioctl 		#[dir="both"]
 	APP -> "libtest.so" -> ioctl 	#[dir="both"]
 	test_drv -> Others 		#[dir="both"]
+#	test_drv:n -> Others:e 		#[dir="both"]	# ==> test node's position, n e s w
 
 
 #	{ rank=same; APP, test_drv }

@@ -1,2 +1,3 @@
 all:
-	dot -Tpng -O drv.gv
+	dot -Gdpi=300 -Tpng -O drv.gv
+#	dot -Tpng -O drv.gv
