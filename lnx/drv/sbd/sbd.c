@@ -81,7 +81,11 @@ static void sbd_request(struct request_queue *q)
 		// blk_fs_request() was removed in 2.6.36 - many thanks to
 		// Christian Paro for the heads up and fix...
 		//if (!blk_fs_request(req)) {
+#if LINUX_VERSION_CODE  < KERNEL_VERSION(4,11,0)
 		if (req->cmd_type != REQ_TYPE_FS) {
+#else
+		if (blk_rq_is_passthrough(req)) {
+#endif
 			printk(KERN_NOTICE "Skip non-CMD request\n");
 			__blk_end_request_all(req, -EIO);
 			req = blk_fetch_request(q);
@@ -134,6 +138,7 @@ static int __init sbd_init(void)
 	Device.size = nsectors * logical_block_size;
 	spin_lock_init(&Device.lock);
 	Device.data = vmalloc(Device.size);
+//	Device.data = (u8 *)ioremap((phys_addr_t)(0xdeadbeef), Device.size);
 	if (Device.data == NULL)
 		return -ENOMEM;
 /*
@@ -170,6 +175,7 @@ out_unregister:
 	unregister_blkdev(major_num, "sbd");
 out:
 	vfree(Device.data);
+//	iounmap(Device.data);
 	return -ENOMEM;
 }
 
@@ -180,6 +186,7 @@ static void __exit sbd_exit(void)
 	unregister_blkdev(major_num, "sbd");
 	blk_cleanup_queue(Queue);
 	vfree(Device.data);
+//	iounmap(Device.data);
 }
 
 module_init(sbd_init);

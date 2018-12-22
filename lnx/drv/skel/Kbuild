@@ -1,0 +1,4 @@
+ccflags-y := -I$(MYDIR)/include -DFLAGS_FOR_ALL_O
+CFLAGS_init.o += -DFLAGS_FOR_INIT_O
+obj-$(CONFIG_MY_DRV) := drv.o tst.o
+drv-y := init.o ops.o
