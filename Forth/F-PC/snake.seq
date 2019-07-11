@@ -1,0 +1,91 @@
+VARIABLE RND                            ( seed )
+HERE RND !                              ( initialize seed )
+
+: RANDOM ( -- n, a random number within 0 to 65536 )
+        RND @ 31421 *                   ( RND*31421 )
+        6927 +                          ( RND*31421+6926, mod 65536)
+        DUP RND !                       ( refresh he seed )
+        ;
+
+: CHOOSE ( n1 -- n2, a random number within 0 to n1 )
+        RANDOM UM*                      ( n1*random to a double product)
+        SWAP DROP                       ( discard lower part )
+        ;                                ( in fact divide by 65536 )
+
+\ : not ( b -- b ) true xor ;
+\ : myrand ( a b -- r ) over - utime + swap mod + ;
+: myrand ( a b -- r ) 1- choose + ;
+: at-xy ( x y -- ) at ;
+: cells 2* ;
+
+: snake-size 200 ;
+: xdim 50 ;
+: ydim 20 ;
+
+create snake snake-size cells 2* allot
+create apple 2 cells allot
+variable head
+variable mylength
+variable direction
+create oldtail 2 cells allot
+
+: segment ( seg -- adr ) head @ + snake-size mod cells 2* snake + ;
+: pos+ ( x1 y1 x2 y2 -- x y ) rot + -rot + swap ;
+: point= 2@ rot 2@ rot = -rot = and ;
+
+: head* ( -- x y ) 0 segment ;
+: move-head! ( -- ) head @ 1 - snake-size mod head ! ;
+: grow! ( -- ) 1 mylength +! ;
+
+: eat-apple! ( -- )  1 xdim myrand 1 ydim myrand apple 2! grow! ;
+: step! ( xdiff ydiff -- ) head* 2@ move-head! pos+ head* 2! oldtail 2@ at-xy space ;
+
+: left  -1  0 ;
+: right  1  0 ;
+: down   0  1 ;
+: myup   0 -1 ;
+\ : mypage page dark ;
+: mypage ;
+
+: wall? ( -- bool ) head* 2@ 1 ydim within swap 1 xdim within and not ;
+: crossing? ( -- bool ) false mylength @ 1 ?do i segment head* point= or loop ;
+: apple? ( -- bool ) head* apple point= ;
+: dead? wall? crossing? or ;
+
+: draw-frame ( -- ) 0 0 at-xy xdim 0 ?do ." +" loop
+ ydim 0 ?do xdim i at-xy ." +" cr ." +" loop xdim 0 ?do ." +" loop cr ;
+\ : draw-snake ( -- ) mylength @ 0 ?do i segment 2@ 2dup oldtail 2! at-xy ." #" loop ;
+: draw-snake ( -- ) 0 segment 2@ at-xy ." #" mylength @ 1- segment 2@ oldtail 2! ;
+: draw-apple ( -- ) apple 2@ at-xy ." Q" ;
+
+: .mystatus 0 22 at-xy mylength @ . apple 2@ swap ." x=" . ." y=" . ;
+
+\ : render mypage draw-snake draw-apple draw-frame cr mylength @ . ;
+: render mypage draw-snake draw-apple .mystatus ;
+
+: newgame!
+  0 head ! xdim 2/ ydim 2/ snake 2! 3 3 apple 2! 3 mylength !
+  draw-frame
+  ['] myup direction ! left step! left step! ;
+
+: gameloop ( time -- )
+begin render dup ms
+key? if key
+   dup 203 = if ['] left else
+   dup 200 = if ['] myup else
+   dup 205 = if ['] right else
+   dup 208 = if ['] down else direction @
+   then then then then
+  direction ! drop then
+direction perform step!
+apple? if eat-apple! then
+dead? until drop 0 23 at-xy ." *** GAME OVER ***" ;
+
+: mystart
+dark
+newgame!
+
+20 21 at-xy ." Snake in Forth"
+\ 3000 ms
+100 gameloop ;
+
